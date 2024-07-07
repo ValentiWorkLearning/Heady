@@ -83,6 +83,7 @@ namespace Heady
 
 			// Open and read file from dirEntry
 			std::ifstream file(dirEntry.path());
+			std::cout <<"Appending:[" << dirEntry.path() << ']'<<std::endl;
 			std::stringstream buffer;
 			buffer << file.rdbuf();
 			std::string fileData = buffer.str();
@@ -164,13 +165,20 @@ namespace Heady
 		if (dirEntries.empty())
 			return;
 
-		// Make sure .cpp files are processed first
+		// Ensure a kind of alphabetical order
+		dirEntries.sort([](const auto & left, const auto & right)
+		{
+			return left.path().stem() < right.path().stem();
+		});
+
+		// Make sure .h files are processed first
 		dirEntries.sort([](const auto & left, const auto & right)
 		{
 			// We're taking advantage of the fact that cpp < h or hpp or inc.  If we need to add other
 			// extensions, we'll have to revisit this.
-			return left.path().extension() < right.path().extension();
+			return left.path().extension() > right.path().extension();
 		});
+
 
 		// Amalgamation-specific define for header
 		std::string outputText;
